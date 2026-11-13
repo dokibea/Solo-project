@@ -56,6 +56,7 @@ public class Movement : MonoBehaviour
         DoubleJumpCheck();
         if (context.performed && !_isJumping)
         {
+            _rb.linearVelocityY = 0;
             _rb.AddForce(Vector2.up.normalized * _jumpForce, ForceMode2D.Impulse);
             _jumpCount++;
         }
@@ -74,6 +75,7 @@ public class Movement : MonoBehaviour
     {
         if (context.performed && !_isDashing)
         {
+            _rb.linearVelocityY = 0;
             _dashMomentum = _moveDir.x * _dashForce;
             StartCoroutine(DashCooldown());
             Debug.Log("Dashing");
