@@ -22,9 +22,10 @@ public class Movement : MonoBehaviour
     private float _decayRate;
     private bool _isJumping = false;
     private bool _isDashing = false;
+    private bool _isSliding = false;    
     private bool _wallSliding = false;
     private bool _inputLock = false;
-    private int _jumpCount = 0;
+    public int _jumpCount = 0;
     private float _wallDir;
     private float _wallJumpRad;
 
@@ -44,9 +45,9 @@ public class Movement : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        if(!_wallSliding)
+        if(!_wallSliding && !_isSliding)
         {
-             _inputX = _inputLock ? 0f : _moveDir.x;
+            _inputX = _inputLock ? 0f : _moveDir.x;
             _rb.linearVelocity = new Vector2(_inputX * _movementSpeed + _dashMomentum, _rb.linearVelocityY);
         }
         if(_dashMomentum != 0){
@@ -77,11 +78,18 @@ public class Movement : MonoBehaviour
             _rb.linearVelocityY = 0;
             _rb.AddForce(Vector2.up.normalized * _jumpForce, ForceMode2D.Impulse);
             _jumpCount++;
+            _isSliding = false;
             Debug.Log("Jumping");
         }
         else if(context.performed && _wallSliding)
         {
-             Vector2 dir = new Vector2(_wallDir * Mathf.Cos(_wallJumpRad), Mathf.Sin(_wallJumpRad));
+            WallJump();
+        } 
+    }
+
+    private void WallJump()
+    {
+         Vector2 dir = new Vector2(_wallDir * Mathf.Cos(_wallJumpRad), Mathf.Sin(_wallJumpRad));
 
              _rb.linearVelocityY = 0;
              _rb.AddForce( Vector2.up * dir.y * _wallKickForce, ForceMode2D.Impulse);
@@ -90,7 +98,6 @@ public class Movement : MonoBehaviour
 
              _wallSliding = false;
              Debug.Log("Wall Jumping");
-        } 
     }
 
     private void DoubleJumpCheck()
@@ -112,6 +119,25 @@ public class Movement : MonoBehaviour
         }
     }
 
+    public void Crouch(InputAction.CallbackContext context)
+    {
+        if (context.performed && !_isDashing && !_isJumping)
+        {
+          _movementSpeed = _movementSpeed / 2;
+          transform.localScale = new Vector3(1, 0.8f, 1);
+
+        }else if(context.performed && _isDashing && _jumpCount == 0)
+        {
+          _isSliding = true;
+          transform.localScale = new Vector3(1, 0.8f, 1);
+
+        }else if(context.canceled && !_isDashing && !_isJumping)
+        {
+          _movementSpeed = _movementSpeed * 2;
+          transform.localScale = new Vector3(1, 1, 1);
+        }
+    }
+
     private void OnCollisionStay2D(Collision2D collision)
     {
         switch (collision.gameObject.tag)
@@ -129,13 +155,15 @@ public class Movement : MonoBehaviour
             case "Wall":
                 WallSlide(collision);
             break;
+            case "Ground":
+            _jumpCount = 0;
+            break;
         }
     }
 
     private void Groundreset()
     {
         _isJumping = false;
-        _jumpCount = 0;
         Debug.Log("Grounded");
     }
 
