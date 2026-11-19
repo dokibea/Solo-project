@@ -115,7 +115,6 @@ public class PlayerController : MonoBehaviour
              _rb.AddForce( Vector2.up * dir.y * _wallKickForce, ForceMode2D.Impulse);
              _dashMomentum = dir.x * _wallKickForce;
               StartCoroutine(WallJumpLock());
-
              _wallSliding = false;
     }
 
@@ -191,7 +190,7 @@ public class PlayerController : MonoBehaviour
             if(ledgeZone < _hitbox.bounds.center.y && _hitbox.bounds.min.y !< ledgeZone)
             {
                 StartCoroutine(LedgeClimb(contact.collider.bounds.max.y,-contact.normal.x));
-                 transform.rotation = Quaternion.Euler(0, contact.normal.x > 0 ? 180 : 0, 0);
+                transform.rotation = Quaternion.Euler(0, contact.normal.x > 0 ? 180 : 0, 0);
             }
         }
     }
@@ -251,13 +250,13 @@ public class PlayerController : MonoBehaviour
     {
         _wallDir = collision.GetContact(0).normal.x;
 
-        if(collision.GetContact(0).normal.y < 0.5f){
+        if(collision.GetContact(0).normal.y < 0.5f && collision.GetContact(0).normal.y > -0.5f){
 
           _wallSliding = true;
           _rb.linearVelocityY = 0;
           transform.rotation = Quaternion.Euler(0, _wallDir > 0 ? 0 : 180, 0);
         }
-        else
+        else if(collision.GetContact(0).normal.y > 0.5f )
         {
             Groundreset ();
         }
