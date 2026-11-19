@@ -172,6 +172,9 @@ public class PlayerController : MonoBehaviour
             case "Ground":
             Groundreset();
             break;
+            case "Platform":
+            WallSlide(collision);
+            break;
         }
 
        LedgeGrab(collision);
@@ -188,6 +191,7 @@ public class PlayerController : MonoBehaviour
             if(ledgeZone < _hitbox.bounds.center.y && _hitbox.bounds.min.y !< ledgeZone)
             {
                 StartCoroutine(LedgeClimb(contact.collider.bounds.max.y,-contact.normal.x));
+                 transform.rotation = Quaternion.Euler(0, contact.normal.x > 0 ? 180 : 0, 0);
             }
         }
     }
