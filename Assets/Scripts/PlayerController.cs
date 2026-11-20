@@ -166,13 +166,13 @@ public class PlayerController : MonoBehaviour
         switch (collision.gameObject.tag)
         {
             case "Wall":
-                WallSlide(collision);
+                 WallSlide(collision);
             break;
             case "Ground":
-            Groundreset();
+                 Groundreset();
             break;
             case "Platform":
-            WallSlide(collision);
+                  WallSlide(collision);
             break;
         }
 
